@@ -46,21 +46,36 @@ int main(int argc, const char **argv)
     if( osm_data.empty() && !osm_data_file.empty() ) {
         std::cout << "Reading OpenStreetMap data from the following file: " <<  osm_data_file << std::endl;
         auto data = ReadFile(osm_data_file);
-        if( !data )
+        if( !data ) {
             std::cout << "Failed to read." << std::endl;
-        else
+            return 1;
+         } else {
             osm_data = std::move(*data);
+         }
     }
     
     // TODO 1: Declare floats `start_x`, `start_y`, `end_x`, and `end_y` and get
     // user input for these values using std::cin. Pass the user input to the
     // RoutePlanner object below in place of 10, 10, 90, 90.
+    float start_x=-1, start_y, end_x, end_y;
+    std::cout << "Enter x coordinate of the start point (in percent, range [0, 100]): ";
+    std::cin >> start_x;
+    std::cout << "Enter y coordinate of the start point (in percent, range [0, 100]): ";
+    std::cin >> start_y;
+    std::cout << "Enter x coordinate of the end point (in percent, range [0, 100]): ";
+    std::cin >> end_x;
+    std::cout << "Enter y coordinate of the end point (in percent, range [0, 100]): ";
+    std::cin >> end_y;
+    if (std::cin.fail()) {
+        std::cout << "\nNo valid coordinates entered. Make sure that all coordinates are in the range [0, 100]." << std::endl;
+        return 1;
+    }
 
     // Build Model.
     RouteModel model{osm_data};
 
     // Create RoutePlanner object and perform A* search.
-    RoutePlanner route_planner{model, 10, 10, 90, 90};
+    RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
     route_planner.AStarSearch();
 
     std::cout << "Distance: " << route_planner.GetDistance() << " meters. \n";
